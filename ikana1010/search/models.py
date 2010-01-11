@@ -1,4 +1,4 @@
-from django.db import models
+from django.contrib.gis.db import models
 
 SOURCES = ((0, "Twitter"), (1, "FaceBook"), (3, "Flickr"))
 
@@ -7,7 +7,7 @@ class Message(models.Model):
     contents = models.CharField(max_length=4000, db_index=True)
     user_name = models.CharField(max_length=200, null=True, blank=True)
     source = models.IntegerField(default=0, choices=SOURCES)
-    #location
+    location = models.PointField()
     created_at = models.DateTimeField(null=True, blank=True)
     last_update = models.DateTimeField(auto_now=True)
     
