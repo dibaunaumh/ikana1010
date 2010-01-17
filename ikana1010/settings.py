@@ -15,8 +15,8 @@ base_dir = os.path.abspath(os.path.dirname(__file__))
 DATABASES = {
     'default': {
         'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'template_postgis',             # Or path to database file if using sqlite3.
-        'USER': 'dmitri',                   # Not used with sqlite3.
+        'NAME': 'template_postgis',      # Or path to database file if using sqlite3.
+        'USER': 'dmitri',                # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
@@ -71,7 +71,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'template_postgis',             # Or path to database file if using sqlite3.
+        'NAME': 'ikana1010',             # Or path to database file if using sqlite3.
         'USER': 'dmitri',                   # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -143,5 +143,5 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.gis',
-    'search',
+    'ikana1010.search'
 )
