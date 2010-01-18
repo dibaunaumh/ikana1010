@@ -1,0 +1,58 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+
+<script src="/static/mootools-1.2.4-core-yc.js"></script>
+
+<script type="application/javascript">
+	
+	var location_x = 0.0;
+	var location_y = 0.0;
+	
+	function choose_location() {
+		get_location_from_map();
+
+		// show search form
+		document.getElementById("location_form").style.display = "none";
+		document.getElementById("location_form").style.visibility = "hidden";
+		
+		document.getElementById("search_form").style.display = "block";
+		document.getElementById("search_form").style.visibility = "visible";	
+	}
+	
+	function get_location_from_map() {
+		location_x = 37.803782;
+		location_y = -122.417049;
+	}
+	
+	function search() {
+		var concept = document.getElementById("concept").value;
+		alert("Searching for " + concept + " near (" + location_x + ", " + location_y + ")...");
+		var jsonRequest = new Request.JSON({url: "/search/", onSuccess: function(result, responseText){
+				alert(responseText);
+			    alert(result.count);
+			}}).get({'q': concept});
+	}
+</script>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<h1>Search near-by people to collaborate with</h1>
+
+	<div id="location_form" style="display: block; visibility: visible;">
+		Click on the map to choose your locacation: <input type="button" value="Continue" onclick="choose_location()"/>	
+	</div>
+
+	<div id="search_form" style="display: none; visibility: hidden;">
+		Enter a keyword to search: <input type="text" id="concept"/> <input type="button" value="Search" onclick="search()"/>	
+	</div>
+
+<div id="map" style="background-color: lightgrey; width: 400pt; height: 300pt;"/>
+
+{% endblock %}
