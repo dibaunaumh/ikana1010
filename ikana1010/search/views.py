@@ -11,4 +11,7 @@ def home(request):
 
 def search(request):
     concept = request.GET["q"] if "q" in request.GET else "No query specified"
-    return HttpResponse("{ 'concept': '%s' }" % concept, mimetype='application/json')
+    x = float(request.GET["location_x"]) if "location_x" in request.GET else 0.0  
+    y = float(request.GET["location_y"]) if "location_y" in request.GET else 0.0
+    
+    return HttpResponse("{ 'concept': '%s', x: %f; y: %f }" % (concept, x, y), mimetype='application/json')

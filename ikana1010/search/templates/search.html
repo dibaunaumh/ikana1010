@@ -28,10 +28,14 @@
 	
 	function search() {
 		var concept = document.getElementById("concept").value;
-		var jsonRequest = new Request.JSON({url: "/search/", onSuccess: function(responseJSON, responseText){
-				alert(responseText);
-			}}).get({'q': concept});
+		var params = { 'q': concept, "location_x": location_x, "location_y": location_y };
+		var jsonRequest = new Request.JSON({url: "/search/", onSuccess: process_results}).get(params);
 	}
+	
+	function process_results(responseJSON, responseText) {
+		alert(responseText);
+	}
+	
 </script>
 
 
@@ -51,6 +55,6 @@
 		Enter a keyword to search: <input type="text" id="concept"/> <input type="button" value="Search" onclick="search()"/>	
 	</div>
 
-<div id="map" style="background-color: lightgrey; width: 400pt; height: 300pt;"/>
+	<div id="map" style="background-color: lightgrey; width: 400pt; height: 300pt;"/>
 
 {% endblock %}
