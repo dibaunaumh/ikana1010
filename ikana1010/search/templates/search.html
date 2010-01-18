@@ -4,6 +4,44 @@
 {% block extrahead %}
 
 <script src="/static/mootools-1.2.4-core-yc.js"></script>
+<script src="http://maps.google.com/maps?file=api&v=2&sensor=false&key=ABQIAAAANcexVU-PTYxrvhlhfETtrRSviK87wC1D4ZXd6SUwo7wtUQVNOxQHWkEN8vWrkqYxypQwuLMe_prApQ"></script>
+
+<script>
+var map;
+function initialize() {
+    if (GBrowserIsCompatible()) {
+        map = new GMap2(document.getElementById('map'));
+        map.setCenter(new GLatLng(41.879535, -87.624333), 5);
+        map.setUIToDefault();
+    }
+}
+
+function addLoadEvent(func) {
+  var oldonload = window.onload;
+  if (typeof window.onload != 'function') {
+    window.onload = func;
+  } else {
+    window.onload = function() {
+      if (oldonload) {
+        oldonload();
+      }
+      func();
+    }
+  }
+}
+
+addLoadEvent(initialize);
+
+</script>
+<style>
+    body {
+        font-family: sans-serif;
+    }
+    #map {
+        width: 500px;
+        height: 300px;
+    }
+</style>
 
 <script type="application/javascript">
 	
@@ -36,10 +74,12 @@
 		alert(responseText);
 	}
 	
+
 </script>
 
 
 {% endblock %}
+
 
 
 
@@ -55,6 +95,6 @@
 		Enter a keyword to search: <input type="text" id="concept"/> <input type="button" value="Search" onclick="search()"/>	
 	</div>
 
-	<div id="map" style="background-color: lightgrey; width: 400pt; height: 300pt;"/>
-
+	<div id="map"></div>
+	
 {% endblock %}
