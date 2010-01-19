@@ -67,10 +67,10 @@ addLoadEvent(initialize);
 			return;
 		}
 		
-		var locationLatLng = locationMarker.getLatLng();
+		var latLong = locationMarker.getLatLng();
 		var concept = document.getElementById("concept").value;
 
-		var params = { 'q': concept, "location_x": locationLatLng.lat(), "location_y": locationLatLng.lng() };
+		var params = { 'q': concept, "location": "POINT(" + latLong.lat() + " " + latLong.lng()  + ")"};
 		var jsonRequest = new Request.JSON({url: "/search/", onSuccess: process_results}).get(params);
 	}
 	

@@ -2,6 +2,8 @@ from models import *
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.paginator import Paginator
+from django.contrib.gis.geos import *
+from django.contrib.gis.measure import D 
 
 
 def home(request):
@@ -10,8 +12,12 @@ def home(request):
 
 
 def search(request):
+    #Parse request
     concept = request.GET["q"] if "q" in request.GET else "No query specified"
-    x = float(request.GET["location_x"]) if "location_x" in request.GET else 0.0  
-    y = float(request.GET["location_y"]) if "location_y" in request.GET else 0.0
+    pntwkt  = request.GET["location"] if "location" in request.GET else 'POINT(0.0 0.0)'    
     
-    return HttpResponse("{ 'concept': '%s', x: %f; y: %f }" % (concept, x, y), mimetype='application/json')
+    #Create GEOS Geometry object to future usage in GIS queries 
+    pnt = GEOSGeometry(pntwkt)
+    
+    #Return the response back
+    return HttpResponse("{ 'concept': '%s', WKT: %s}" % (concept, pntwkt), mimetype='application/json')
