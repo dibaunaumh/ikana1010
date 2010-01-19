@@ -8,11 +8,28 @@
 
 <script>
 var map;
+var locationMarker;
+
 function initialize() {
     if (GBrowserIsCompatible()) {
         map = new GMap2(document.getElementById('map'));
-        map.setCenter(new GLatLng(41.879535, -87.624333), 5);
+        map.setCenter(new GLatLng(40.713956, -74.014893), 7);
         map.setUIToDefault();
+		
+		GEvent.addListener(map,"click", function(overlay, latlng) {     
+  				if (latlng) { 
+					var marker = new GMarker(latlng, {draggable: true});
+					
+					if(locationMarker){
+						map.removeOverlay(locationMarker);
+					}
+					
+					locationMarker= marker;
+					map.addOverlay(marker);
+  				}
+			}
+		);
+
     }
 }
 
@@ -44,29 +61,16 @@ addLoadEvent(initialize);
 </style>
 
 <script type="application/javascript">
-	
-	var location_x = 0.0;
-	var location_y = 0.0;
-	
-	function choose_location() {
-		get_location_from_map();
-
-		// show search form
-		document.getElementById("location_form").style.display = "none";
-		document.getElementById("location_form").style.visibility = "hidden";
-		
-		document.getElementById("search_form").style.display = "block";
-		document.getElementById("search_form").style.visibility = "visible";	
-	}
-	
-	function get_location_from_map() {
-		location_x = 37.803782;
-		location_y = -122.417049;
-	}
-	
 	function search() {
+		if(locationMarker == null){
+			alert("Please, click on the map to choose your locacation first.");
+			return;
+		}
+		
+		var locationLatLng = locationMarker.getLatLng();
 		var concept = document.getElementById("concept").value;
-		var params = { 'q': concept, "location_x": location_x, "location_y": location_y };
+
+		var params = { 'q': concept, "location_x": locationLatLng.lat(), "location_y": locationLatLng.lng() };
 		var jsonRequest = new Request.JSON({url: "/search/", onSuccess: process_results}).get(params);
 	}
 	
@@ -87,11 +91,7 @@ addLoadEvent(initialize);
 
 <h1>Search near-by people to collaborate with</h1>
 
-	<div id="location_form" style="display: block; visibility: visible;">
-		Click on the map to choose your locacation: <input type="button" value="Continue" onclick="choose_location()"/>	
-	</div>
-
-	<div id="search_form" style="display: none; visibility: hidden;">
+	<div id="search_form" style="display: block; visibility: visible;">
 		Enter a keyword to search: <input type="text" id="concept"/> <input type="button" value="Search" onclick="search()"/>	
 	</div>
 
