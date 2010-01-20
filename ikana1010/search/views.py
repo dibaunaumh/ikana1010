@@ -23,12 +23,12 @@ def search(request):
     
     json = "{}"
     try:
-        messages = Message.objects.filter(location__distance_lte=(pnt, D(km=10)))
+        
+        messages = Message.objects.filter(location__distance_lte=(pnt, D(km=10))).filter(concepts__concept__name=concept)
         
         results = []
         for msg in messages:
-            concepts = ConceptAppearance.objects.filter(message=msg)
-            for c in concepts:
+            for c in msg.concepts.filter(concept__name=concept):
                 results.append({ "person_username": c.person.name, "concept": c.concept.name, "message": msg.contents, "x": msg.get_x(), "y": msg.get_y() })
             
         
