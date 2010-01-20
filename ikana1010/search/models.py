@@ -1,6 +1,5 @@
 from django.contrib.gis.db import models
 
-SOURCES = (("TW", "Twitter"), ("FB", "FaceBook"), ("FL", "Flickr"))
 
 class Person(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True)
@@ -9,7 +8,7 @@ class Person(models.Model):
         return self.name
     
 class DataSource(models.Model):
-    name = models.CharField(max_length=2, choices=SOURCES)
+    name = models.CharField(max_length=100)
     
     def __unicode__(self):
         return self.name
@@ -26,12 +25,23 @@ class Message(models.Model):
     #Last message update
     last_update = models.DateTimeField(auto_now=True)
     #Message location (WTK format)
-    location = models.PointField()
+    location = models.PointField(srid=32140)
     #Message creation time
     created_at = models.DateTimeField(null=True, blank=True)
     
+    objects = models.GeoManager()
+    
     def __unicode__(self):
         return self.contents
+    
+    
+    def get_x(self):
+        return self.location.get_x()
+    
+    def get_y(self):
+        return self.location.get_y()
+    
+    
     
     
 class Concept(models.Model):
@@ -47,6 +57,7 @@ class ConceptAppearance(models.Model):
     message = models.ForeignKey(Message, related_name="concepts")
     concept = models.ForeignKey(Concept, related_name="appearances")
     person = models.ForeignKey(Person, related_name="appearances")
+    
     
     def __unicode__(self):
         return "Concept %s appeared in message %s" % (self.concept, self.message)
