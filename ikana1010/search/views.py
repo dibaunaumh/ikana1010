@@ -23,9 +23,10 @@ def search(request):
     
     json = "{}"
     try:
-        
-        messages = Message.objects.filter(location__distance_lte=(pnt, D(km=10))).filter(concepts__concept__name=concept)
-        
+        messages = Message.objects.filter(location__distance_lte=(pnt, D(km=10)))
+        print messages
+#        .filter(concepts__concept__name=concept)
+              
         results = []
         for msg in messages:
             for c in msg.concepts.filter(concept__name=concept):

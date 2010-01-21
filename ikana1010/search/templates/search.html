@@ -75,7 +75,36 @@ addLoadEvent(initialize);
 	}
 	
 	function process_results(responseJSON, responseText) {
-		alert(responseText);
+		if(responseJSON.length == 0){
+			alert("There is no results found.");
+			return;
+		}
+		
+		// Create our "tiny" marker icon
+		var blueIcon = new GIcon(G_DEFAULT_ICON);
+		blueIcon.image = "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png";
+                
+		// Set up our GMarkerOptions object
+		markerOptions = { icon:blueIcon };
+
+		map.clearOverlays();
+		map.addOverlay(locationMarker);
+		
+		for(var i = 0; i < responseJSON.length; i++){
+			var rspObj = responseJSON[i];
+			
+			var marker = new GMarker(
+				new GLatLng(rspObj.x, rspObj.y), 
+				markerOptions
+			);
+			
+			GEvent.addListener(marker, "click", function() {
+    			marker.openInfoWindowHtml("<br/>" + rspObj.message);
+  			});
+
+			map.addOverlay(marker);
+		}
+			
 	}
 	
 
