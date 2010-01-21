@@ -16,6 +16,7 @@ def home(request):
 def search(request):
     #Parse request
     concept = request.GET["q"] if "q" in request.GET else "No query specified"
+    distance = int(request.GET["d"]) if "d" in request.GET else 5
     pntwkt  = request.GET["location"] if "location" in request.GET else 'POINT(0.0 0.0)'    
     
     #Create GEOS Geometry object to future usage in GIS queries 
@@ -23,8 +24,12 @@ def search(request):
     
     json = "{}"
     try:
-        messages = Message.objects.filter(location__distance_lte=(pnt, D(km=10))).filter(concepts__concept__name=concept)
-                      
+        messages = Message.objects.filter(location__distance_lte=(pnt, D(km=distance)))
+        print "before: ", messages.count()
+        
+        messages = messages.filter(concepts__concept__name=concept)
+        print "after: ", messages.count()
+                       
         results = []
         for msg in messages:
             for c in msg.concepts.filter(concept__name=concept):

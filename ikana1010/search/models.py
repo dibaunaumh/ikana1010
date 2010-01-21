@@ -25,7 +25,7 @@ class Message(models.Model):
     #Last message update
     last_update = models.DateTimeField(auto_now=True)
     #Message location (WTK format)
-    location = models.PointField(srid=32140)
+    location = models.PointField()
     #Message creation time
     created_at = models.DateTimeField(null=True, blank=True)
     
