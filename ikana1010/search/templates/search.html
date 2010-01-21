@@ -103,11 +103,13 @@ addLoadEvent(initialize);
 			GEvent.addListener(marker, "click", function() {
     			marker.openInfoWindowHtml(
 					"<br/><p align=\"left\">" 
-					+ rspObj.message 
-					+ "<br>(<em>by  </em></b><a href=/ucgraph/?u=" + rspObj.person_username
+					+ rspObj.message.replace(rspObj.concept, "<em><b>" 
+					+ rspObj.concept + "</b></em>") 
+					+ "<br/>---<br/><em>by <a href=/ucgraph/?u=" 
+					+ rspObj.person_username
 					+ ">" 
 					+ rspObj.person_username 
-					+ "</a>)"
+					+ "</a></em>"
 				);
   			});
 
