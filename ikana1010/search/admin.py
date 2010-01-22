@@ -5,6 +5,7 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ["contents", "user", "source", "created_at"]
     search_fields = ["contents", "user"]
     list_filter = ["source", "user"]
+    date_hierarchy = "created_at"
 
 
 class ConceptAdmin(admin.ModelAdmin):
