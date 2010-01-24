@@ -8,7 +8,7 @@ def log(message):
     print "[%s] %s" % (time.strftime("%I:%M:%S %p"), message)
 
 
-def invoke(domain="localhost:8000", task="/fetch_messages", verbose=False):
+def invoke(domain="localhost:8011", task="/fetch_messages", verbose=False):
     """Invokes a periodic service, using an HTTP call"""
     try:
         params_map = {}
@@ -24,6 +24,7 @@ def invoke(domain="localhost:8000", task="/fetch_messages", verbose=False):
             log("Processing completed successfully.")
         else:
             log("Error in processing (HTTP status code %d)" % response.status)
+            print response
         data = response.read()
         if verbose:
             print data

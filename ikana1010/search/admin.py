@@ -20,9 +20,13 @@ class PersonAdmin(admin.ModelAdmin):
 class DataSourceAdmin(admin.ModelAdmin):
     pass
 
+class Match(admin.ModelAdmin):
+    pass
+
 
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Concept, ConceptAdmin)
 admin.site.register(DataSource, DataSourceAdmin)
 admin.site.register(ConceptAppearance, ConceptAppearanceAdmin)
+admin.site.register(Match, MatchAdmin)
