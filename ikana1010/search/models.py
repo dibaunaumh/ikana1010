@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.db.models.signals import post_save
 
 
 class DataSource(models.Model):
@@ -95,5 +96,9 @@ class Match(models.Model):
     
     
     def __unicode__(self):
-        return u"Match between %s and %s" % (person1, person2)
+        return u"Match between %s and %s" % (self.person1, self.person2)
     
+def notify_match(sender, **kwargs):
+    print kwargs["instance"]
+    
+post_save.connect(notify_match, sender=Match)

@@ -7,12 +7,40 @@ from django.contrib.gis.measure import D
 from django.core import serializers
 import sys
 import simplejson
+import logging
 
 def home(request):
-    return render_to_response("search.html", locals())
+    #Retrieve TOP 10 Matches
+    top_matches = Match.objects.all().order_by('-id')[:10]
+    
+    messges = []
+    persons = set()
+    for match in top_matches:
+        if match.person1 in persons:
+            persons.add(match.person1)
+            
+            res = match.person1.messages.order_by('-last_update')
+            if len(res) > 0: 
+                messges.append(res[0])
+        
+        if not match.person2 in persons:
+            persons.add(match.person2)
+            
+            res = match.person2.messages.order_by('-last_update')
+            if len(res) > 0: 
+                messges.append(res[0])
+        
+    print "Found messges: ", len(messges)
+    print "Found matches: ", len(top_matches)
+    
+    return render_to_response("index.html", locals())
 
-
-
+def get_last_user_message(person):
+    try:
+        return person.messages.order_by('-last_update')
+    except:
+        pass
+    
 def search(request):
     #Parse request
     concept = request.GET["q"] if "q" in request.GET else "No query specified"

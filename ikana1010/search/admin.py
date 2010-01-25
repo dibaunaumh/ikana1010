@@ -20,7 +20,7 @@ class PersonAdmin(admin.ModelAdmin):
 class DataSourceAdmin(admin.ModelAdmin):
     pass
 
-class Match(admin.ModelAdmin):
+class MatchAdmin(admin.ModelAdmin):
     pass
 
 

@@ -2,6 +2,7 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+SCORE_TRESHOLD = 3
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -16,7 +17,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'ikana1010',             # Or path to database file if using sqlite3.
-        'USER': 'udibauman',                   # Not used with sqlite3.
+        'USER': 'dmitri',                   # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
