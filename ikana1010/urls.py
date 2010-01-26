@@ -20,5 +20,7 @@ urlpatterns = patterns('',
 
     (r'^search/', 'ikana1010.search.views.search'),    
     
+    (r'^receive_messages/', 'ikana1010.search.views.receive_messages'),
+    
     (r'^', 'ikana1010.search.views.home'),    
 )

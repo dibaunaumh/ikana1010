@@ -27,6 +27,7 @@ class Message(models.Model):
     location_wkt = models.CharField(max_length=200, null=True, blank=True)
     data_source = models.CharField(max_length=100, default=DEFAULT_DATA_SOURCE)
     posted_at = models.DateTimeField(auto_now_add=True)
+    pushed = models.BooleanField(default=False, help_text="Whether the message was pushed to the match engine")
     
     
     def __unicode__(self):

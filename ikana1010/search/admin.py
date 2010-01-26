@@ -2,9 +2,9 @@ from django.contrib import admin
 from models import *
 
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ["contents", "user", "source", "created_at"]
+    list_display = ["contents", "user", "source", "location", "created_at"]
     search_fields = ["contents", "user"]
-    list_filter = ["source", "user"]
+    list_filter = ["source",]
     date_hierarchy = "created_at"
 
 

@@ -16,7 +16,7 @@ function initialize() {
         map.setUIToDefault();
 		
 		{% for messg in messges %}
-			var latLon = new GLatLng({{ messg.location_wkt.lat() }}, {{ messg.location_wkt.lon() }});
+			var latLon = new GLatLng({{ messg.get_y }}, {{ messg.get_x }});
 			map.addOverlay(new GMarker(latLon))
 		{% endfor %}
 
@@ -119,13 +119,20 @@ addLoadEvent(initialize);
 
 {% block content %}
 
-	<h1>Search near-by people to collaborate with</h1>
+	<h1>Welcome to Ikana1010!</h1>
 	
+	<p>Ikana1010 is a service that searches for near-by people with common interests, based on social media. 
+	Whenever such match is found, a notification is sent to these persons, in hope that they'll connect
+	& collaborate.</p>
+	
+	<p>
+		Most recent matches found:
 	{% for match in top_matches %}
 		<ul>
-			<li>{% str(match) %}</li>
+			<li>{{ match }}</li>
 		</ul>
 	{% endfor %}
+	</p>
 	
 	<div id="map"></div>
 	

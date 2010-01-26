@@ -16,4 +16,6 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     
     (r'^fetch_messages', 'sensor.views.fetch_messages'),
+
+    (r'^push_messages', 'sensor.views.push_messages'),
 )
