@@ -1,0 +1,28 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+
+
+{% block content %}
+
+	<h1>A match found between <a href="http://twitter.com/{{ p1.username }}">{{ p1.name }}</a> &amp; <a href="http://twitter.com/{{ p2.username }}">{{ p2.name }}</a>!</h1>
+	
+	<table width="80%">
+		<tr>
+			<td>
+				<img src="{{ p1.picture }}"/>
+			</td>
+			<td>
+				<img src="{{ p2.picture }}"/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				Common concepts: {{ match.common_concepts }}
+			</td>
+		</tr>		
+	</table>
+		
+		
+	
+{% endblock %}
