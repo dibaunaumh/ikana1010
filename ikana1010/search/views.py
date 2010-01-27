@@ -44,6 +44,21 @@ def get_last_user_message(person):
     except:
         pass
     
+    
+    
+def view_match(request, match_id):
+    match = get_object_or_404(Match, pk=match_id)
+    p1 = match.person1
+    p2 = match.person2
+    try:
+        p1_location = get_last_user_message(p1)[0].location
+        p2_location = get_last_user_message(p2)[0].location
+    except:
+        pass
+    return render_to_response("match.html", locals())
+    
+    
+    
 def search(request):
     #Parse request
     concept = request.GET["q"] if "q" in request.GET else "No query specified"

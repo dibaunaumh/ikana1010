@@ -4,6 +4,8 @@ from django.conf import settings
 from search.models import *
 from django.contrib.gis.geos import *
 from django.contrib.gis.measure import D 
+from django.db.models.signals import post_save
+import twitter
 
 
 class DetectMatch(Task):
@@ -45,7 +47,7 @@ class CheckMatchCandidate(Task):
         common_concepts = p1_concepts.intersection(p2_concepts)
         # if its size is greater than the threshold, Bingo! create a Match entity
         if len(common_concepts) > settings.SCORE_TRESHOLD:
-            logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!   JACKPOT   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            logger.info("#######################   JACKPOT   #######################")
             logger.info("Found a match between: %s and %s" % (person1.username, person2.username))
             match = Match()
             match.person1 = person1
@@ -58,3 +60,28 @@ class CheckMatchCandidate(Task):
     
     
 tasks.register(CheckMatchCandidate)
+
+
+
+class SendNotification(Task):
+
+    def run(self, match, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Notify the users %s and %s about a match between them." % (match.person1.username, match.person2.username))
+        notification_text = "Found interests match between @%s & @%s: %s" % (match.person1.username, match.person2.username, match.get_absolute_url())
+        try:
+            client = twitter.Api(username=settings.TWITTER_USER, password=settings.TWITTER_PASSWORD)
+            status = client.PostUpdate(notification_text)
+        except:
+            logger.error("Failed to send notification about a match (%d)" % match.id)
+        return True
+    
+    
+    
+def notify_match(sender, instance, **kwargs):
+    SendNotification.delay(instance)
+    
+    
+post_save.connect(notify_match, sender=Match)
+
+tasks.register(SendNotification)

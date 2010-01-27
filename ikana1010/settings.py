@@ -5,6 +5,10 @@ TEMPLATE_DEBUG = DEBUG
 SCORE_TRESHOLD = 8
 DISTANCE_THRESHOLD = 30
 
+TWITTER_USER = "ikana1010"
+TWITTER_PASSWORD = ""
+
+
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )

@@ -1,5 +1,8 @@
 from django.contrib.gis.db import models
-from django.db.models.signals import post_save
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.conf import settings
+from django.contrib.sites.models import Site
 
 
 class DataSource(models.Model):
@@ -96,11 +99,18 @@ class Match(models.Model):
     viewed = models.BooleanField(default=False)
     rated = models.IntegerField(default=0, choices=MATCH_RATING_CHOICES, help_text="Feedback received by match targets on match quality")
     
+    def get_absolute_url(self):
+        return "http://%s/match/%d/" % (get_domain(), self.id)
     
     def __unicode__(self):
         return u"Match between %s and %s" % (self.person1, self.person2)
     
-def notify_match(sender, **kwargs):
-    print kwargs["instance"]
-    
-post_save.connect(notify_match, sender=Match)
+
+
+def get_domain():
+    """
+    Returns the domain configured in django.contrib.sites
+    """
+    site = Site.objects.get(pk=settings.SITE_ID)
+    return site.domain
+
