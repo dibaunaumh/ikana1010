@@ -2,7 +2,8 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-SCORE_TRESHOLD = 3
+SCORE_TRESHOLD = 8
+DISTANCE_THRESHOLD = 30
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -89,5 +90,13 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.gis',
+    'celery',
     'search',
 )
+
+
+BROKER_HOST = "udi-baumans-computer"
+BROKER_PORT = 5672
+BROKER_USER = "rabbit"
+BROKER_PASSWORD = "mypassword"
+BROKER_VHOST = "myvhost"

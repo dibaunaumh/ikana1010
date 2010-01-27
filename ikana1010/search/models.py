@@ -73,9 +73,11 @@ class ConceptAppearance(models.Model):
     concept = models.ForeignKey(Concept, related_name="appearances")
     person = models.ForeignKey(Person, related_name="appearances")
     
+    objects = models.GeoManager()
+    
     
     def __unicode__(self):
-        return "Concept %s appeared in message %s" % (self.concept, self.message)
+        return "Concept %s appeared in message by %s" % (self.concept.name.encode("UTF-8"), self.person.username.encode("UTF-8"))
     
     
 MATCH_RATING_CHOICES = ((-2, "Completely off"),

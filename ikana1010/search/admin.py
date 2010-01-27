@@ -15,13 +15,13 @@ class ConceptAppearanceAdmin(admin.ModelAdmin):
     pass
 
 class PersonAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['name', 'username', 'profile']
 
 class DataSourceAdmin(admin.ModelAdmin):
     pass
 
 class MatchAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["person1", "person2", "score", "common_concepts"]
 
 
 admin.site.register(Person, PersonAdmin)

@@ -1,4 +1,5 @@
 from models import *
+from search.tasks import DetectMatch
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.paginator import Paginator
@@ -9,6 +10,8 @@ import sys
 import simplejson
 import logging
 import urllib, urllib2
+import nltk
+from nltk import corpus 
 
 
 def home(request):
@@ -31,11 +34,9 @@ def home(request):
             res = match.person2.messages.order_by('-last_update')
             if len(res) > 0: 
                 messges.append(res[0])
-        
-    print "Found messges: ", len(messges)
-    print "Found matches: ", len(top_matches)
-    
+
     return render_to_response("index.html", locals())
+
 
 def get_last_user_message(person):
     try:
@@ -55,11 +56,7 @@ def search(request):
     json = "{}"
     try:
         messages = Message.objects.filter(location__distance_lte=(pnt, D(km=distance)))
-        print "before: ", messages.count()
-        
         messages = messages.filter(concepts__concept__name=concept)
-        print "after: ", messages.count()
-                       
         results = []
         for msg in messages:
             for c in msg.concepts.filter(concept__name=concept):
@@ -88,8 +85,13 @@ def receive_messages(request):
         for m in data['messages']:
             message = create_message(m['fields'], persons)
             messages.append(message)
-        # extract & add the concepts
-        
+            # extract & add the concepts
+            concepts = extract_concepts(message.contents)
+            for c in concepts:
+                concept = create_concept(c)
+                ca = create_concept_appearance(concept, message, person)
+                # invoke match detection async
+                DetectMatch.delay(concept_appearance=ca)
     except:
         print sys.exc_info()
     return HttpResponse("Received messages in JSON format:<br/>%s" % json)
@@ -171,4 +173,47 @@ def geocode(str):
         except:
             print sys.exc_info()
     return fromstr(wkt) 
+
+
+def extract_concepts(text):
+    try:
+        ignored_words = corpus.stopwords.words('english')
+        appeared = {}
+        concepts = []
+        tokenized = nltk.word_tokenize(text)
+        tagged = nltk.pos_tag(tokenized)
+        named_entities = nltk.ne_chunk(tagged)
+        
+        for ne in named_entities.leaves():
+            #if ne[1] in ('NNS', 'NNP', 'NN'):
+            if len(ne[0]) > 2 and ne[0].lower() not in ignored_words and not (ne[0].startswith("http") or ne[0].startswith("//")):
+                name = ne[0]
+                if name in appeared:
+                    continue
+                concepts.append(name)
+                appeared[name] = True
+    except:
+        print "extract concepts failed:", sys.exc_info()
+    return concepts
+
+
+def create_concept(c):
+    query = Concept.objects.filter(name=c)
+    if len(query) == 0:
+        concept = Concept()
+        concept.name = c
+        concept.save()
+    else:
+        concept = query[0]
+    return concept
+
+
+def create_concept_appearance(concept, message, person):
+    ca = ConceptAppearance()
+    ca.message = message
+    ca.concept = concept
+    ca.person = person
+    ca.save()
+    return ca
+
     
