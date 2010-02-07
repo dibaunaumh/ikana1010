@@ -8,7 +8,7 @@ def log(message):
     print "[%s] %s" % (time.strftime("%I:%M:%S %p"), message)
 
 
-def invoke(domain="localhost:8011", task="/fetch_messages", verbose=False):
+def invoke(domain="localhost:8011", task="/push_messages", verbose=False):
     """Invokes a periodic service, using an HTTP call"""
     try:
         params_map = {}
@@ -52,4 +52,4 @@ if __name__ == "__main__":
             invoke(verbose=args["verbose"])
         else:
             invoke()
-        time.sleep(70)
+        time.sleep(300)

@@ -67,6 +67,8 @@ class SendNotification(Task):
 
     def run(self, match, **kwargs):
         logger = self.get_logger(**kwargs)
+        if not settings.SEND_NOTIFICATIONS:
+            return True
         logger.info("Notify the users %s and %s about a match between them." % (match.person1.username, match.person2.username))
         notification_text = "Found interests match between @%s & @%s: %s" % (match.person1.username, match.person2.username, match.get_absolute_url())
         try:

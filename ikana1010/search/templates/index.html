@@ -13,13 +13,30 @@ var locationMarker;
 function initialize() {
     if (GBrowserIsCompatible()) {
         map = new GMap2(document.getElementById('map'));
+		map.setCenter(new GLatLng(0.0, 0.0), 1);
         map.setUIToDefault();
 		
-		{% for messg in messges %}
-			var latLon = new GLatLng({{ messg.get_y }}, {{ messg.get_x }});
-			map.addOverlay(new GMarker(latLon))
-		{% endfor %}
+		// Create our "tiny" marker icon
+		var blueIcon = new GIcon(G_DEFAULT_ICON);
+		blueIcon.image = "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png";
+                
+		// Set up our GMarkerOptions object
+		markerOptions = { icon:blueIcon };
+	
+		{% for mssg in messges %}
+			var marker{{ forloop.counter}} = new GMarker(new GLatLng({{ mssg.get_y }}, {{ mssg.get_x }}), markerOptions);
+			map.addOverlay(marker{{ forloop.counter}});
 
+			GEvent.addListener(marker{{ forloop.counter}}, "click", function() {
+    			marker.openInfoWindowHtml(
+					"<br/><p align=\"left\">" 
+					+ "{{ mssg.contents }}" 
+					+ "<br/>---<br/><em>by " 
+					+ "{{ mssg.user.name }}"
+					+ "</em>");
+  			});
+			
+		{% endfor %}
     }
 }
 
@@ -129,7 +146,7 @@ addLoadEvent(initialize);
 		Most recent matches found:
 	{% for match in top_matches %}
 		<ul>
-			<li>{{ match }}</li>
+			<li><a href="/match/{{ match.id }}/">{{ match }}</a></li>
 		</ul>
 	{% endfor %}
 	</p>

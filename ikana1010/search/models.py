@@ -1,8 +1,6 @@
 from django.contrib.gis.db import models
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.conf import settings
-from django.contrib.sites.models import Site
 
 
 class DataSource(models.Model):
@@ -98,6 +96,7 @@ class Match(models.Model):
     notified = models.BooleanField(default=False)
     viewed = models.BooleanField(default=False)
     rated = models.IntegerField(default=0, choices=MATCH_RATING_CHOICES, help_text="Feedback received by match targets on match quality")
+    last_update = models.DateTimeField(auto_now=True)
     
     def get_absolute_url(self):
         return "http://%s/match/%d/" % (get_domain(), self.id)

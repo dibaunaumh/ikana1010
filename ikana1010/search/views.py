@@ -12,6 +12,7 @@ import logging
 import urllib, urllib2
 import nltk
 from nltk import corpus 
+from rdfalchemy.sesame2 import SesameGraph
 
 
 def home(request):
@@ -21,7 +22,7 @@ def home(request):
     messges = []
     persons = set()
     for match in top_matches:
-        if match.person1 in persons:
+        if not match.person1 in persons:
             persons.add(match.person1)
             
             res = match.person1.messages.order_by('-last_update')
@@ -57,7 +58,34 @@ def view_match(request, match_id):
         pass
     return render_to_response("match.html", locals())
     
-    
+
+def receive_messages(request):
+    json = request.POST["json"]
+    try:
+        owl_store = SesameGraph('http://localhost:8080/openrdf-sesame/repositories/ikana1010')
+        data = simplejson.loads(json)
+        # add if needed the persons
+        persons = {}
+        for p in data['persons']:
+            person = create_person(p['fields'])
+            persons[p['pk']] = person   # map persons by their primary key in the injector, which will be the reference in the messages
+        # add if needed the messages
+        messages = []
+        for m in data['messages']:
+            message = create_message(m['fields'], persons)
+            messages.append(message)
+            # extract & add the concepts
+            concepts = extract_concepts(message.contents)
+            for c in concepts:
+                concept = create_concept(c)
+                ca = create_concept_appearance(concept, message, person, owl_store)
+                # invoke match detection async
+                DetectMatch.delay(concept_appearance=ca)
+    except:
+        print sys.exc_info()
+    return HttpResponse("Received messages in JSON format:<br/>%s" % json)
+
+
     
 def search(request):
     #Parse request
@@ -83,34 +111,6 @@ def search(request):
         print sys.exc_info()
     #Return the response back
     return HttpResponse(json, mimetype='application/json')
-
-
-
-def receive_messages(request):
-    json = request.POST["json"]
-    try:
-        data = simplejson.loads(json)
-        # add if needed the persons
-        persons = {}
-        for p in data['persons']:
-            person = create_person(p['fields'])
-            persons[p['pk']] = person   # map persons by their primary key in the injector, which will be the reference in the messages
-        # add if needed the messages
-        messages = []
-        for m in data['messages']:
-            message = create_message(m['fields'], persons)
-            messages.append(message)
-            # extract & add the concepts
-            concepts = extract_concepts(message.contents)
-            for c in concepts:
-                concept = create_concept(c)
-                ca = create_concept_appearance(concept, message, person)
-                # invoke match detection async
-                DetectMatch.delay(concept_appearance=ca)
-    except:
-        print sys.exc_info()
-    return HttpResponse("Received messages in JSON format:<br/>%s" % json)
-
 
 
 def create_person(p):
@@ -191,8 +191,13 @@ def geocode(str):
 
 
 def extract_concepts(text):
+    """
+    Uses the NLTK natural language processing library to 
+    extract from a text the essential terms that appeared in it.
+    """
     try:
         ignored_words = corpus.stopwords.words('english')
+        ignored_words.append("n't")
         appeared = {}
         concepts = []
         tokenized = nltk.word_tokenize(text)
@@ -212,6 +217,51 @@ def extract_concepts(text):
     return concepts
 
 
+    
+
+def query_concept_type(concept):
+    try:
+        url = r"http://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&query=select+distinct+%3FConcept+where+%7B%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2F{{keyword}}%3E+a+%3FConcept%7D&format=application%2Fsparql-results%2Bjson&debug=on&timeout="
+        url = url.replace('{{keyword}}', concept)
+        return urllib2.urlopen(url).read()
+    except:
+        return None
+    
+    
+    
+def complement_concept_from_dbpedia(concept):
+    print "Complement called with concept: %s" % concept
+
+    data = query_concept_type(concept.title())
+    results = []    
+    if data:
+        json = simplejson.loads(data)
+        bindings = json["results"]["bindings"]
+        for c in bindings:
+            s = c["Concept"]["value"]
+            start_pos = s.rfind("/") + 1
+            results.append(s[start_pos:])
+        print "Results for %s:" % concept, results 
+    return results
+
+
+def complement_concept_from_conceptnet(concept):
+    print "Complement called with concept: %s" % concept
+    
+    results = []    
+    try:
+        from csc.conceptnet.models import *
+        assertions = Assertion.objects.filter(relation__name="IsA", concept1__text=concept)
+        for a in assertions:
+            c = a.concept2.text.replace("'", "").replace(" ", "-")
+            results.append(c)
+    except:
+        pass
+    return results
+
+
+
+
 def create_concept(c):
     query = Concept.objects.filter(name=c)
     if len(query) == 0:
@@ -223,12 +273,15 @@ def create_concept(c):
     return concept
 
 
-def create_concept_appearance(concept, message, person):
+def create_concept_appearance(concept, message, person, owl_store=None):
     ca = ConceptAppearance()
     ca.message = message
     ca.concept = concept
     ca.person = person
     ca.save()
+    if owl_store:
+        # add person
+        owl_store.add(('matching:%s' % person.username, 'rdf:type', 'matching:Person'), context="file://matching.owl")
     return ca
 
     
