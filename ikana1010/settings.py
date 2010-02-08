@@ -80,6 +80,8 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'ikana1010.urls'
 
+MATCHING_NAMESPACE = 'http://www.ikana1010.com/matching.owl#'
+
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.

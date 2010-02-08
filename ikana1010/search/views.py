@@ -1,19 +1,21 @@
-from models import *
-from search.tasks import DetectMatch
-from django.http import HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
-from django.core.paginator import Paginator
-from django.contrib.gis.geos import *
-from django.contrib.gis.measure import D 
-from django.core import serializers
 import sys
-import simplejson
-import logging
-import urllib, urllib2
 import nltk
+import logging
+import simplejson
+import urllib, urllib2
 from nltk import corpus 
-from rdfalchemy.sesame2 import SesameGraph
 
+from models import *
+from rdf_models import *
+from search.tasks import DetectMatch
+
+from django.conf import settings
+from django.core import serializers
+from django.contrib.gis.geos import *
+from django.http import HttpResponse
+from django.contrib.gis.measure import D 
+from django.core.paginator import Paginator
+from django.shortcuts import render_to_response, get_object_or_404
 
 def home(request):
     #Retrieve TOP 10 Matches
@@ -62,7 +64,6 @@ def view_match(request, match_id):
 def receive_messages(request):
     json = request.POST["json"]
     try:
-        owl_store = SesameGraph('http://localhost:8080/openrdf-sesame/repositories/ikana1010')
         data = simplejson.loads(json)
         # add if needed the persons
         persons = {}
@@ -78,7 +79,7 @@ def receive_messages(request):
             concepts = extract_concepts(message.contents)
             for c in concepts:
                 concept = create_concept(c)
-                ca = create_concept_appearance(concept, message, person, owl_store)
+                ca = create_concept_appearance(concept, message, person)
                 # invoke match detection async
                 DetectMatch.delay(concept_appearance=ca)
     except:
@@ -281,7 +282,7 @@ def create_concept_appearance(concept, message, person, owl_store=None):
     ca.save()
     if owl_store:
         # add person
-        owl_store.add(('matching:%s' % person.username, 'rdf:type', 'matching:Person'), context="file://matching.owl")
+        rdfSubject.db.add((URIRef("%(ns)s%(name)s" % {'ns' : matching, 'name' : person.username}), RDF.type, matching.Person))
     return ca
 
     
