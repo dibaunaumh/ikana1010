@@ -282,7 +282,26 @@ def create_concept_appearance(concept, message, person, owl_store=None):
     ca.save()
     if owl_store:
         # add person
-        rdfSubject.db.add((URIRef("%(ns)s%(name)s" % {'ns' : matching, 'name' : person.username}), RDF.type, matching.Person))
+        rdfSubject.db.add((
+            URIRef("%(ns)s%(name)s" % {'ns' : matching, 'name' : person.username}), 
+            RDF.type, 
+            matching.Person
+        ))
+        
+        # add concept
+        rdfSubject.db.add((
+            URIRef("%(ns)s%(name)s" % {'ns' : matching, 'name' : concept.name}), 
+            RDF.type, 
+            matching.Concept
+        ))
+        
+        # add person2concept relation
+        rdfSubject.db.add((
+            URIRef("%(ns)s%(name)s" % {'ns' : matching, 'name' : person.username}), 
+            matching.metion, 
+            URIRef("%(ns)s%(name)s" % {'ns' : matching, 'name' : concept.name})
+        ))
+        
     return ca
 
     

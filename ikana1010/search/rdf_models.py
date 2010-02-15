@@ -17,3 +17,6 @@ rdfSubject.db = SesameGraph('http://localhost:8080/openrdf-sesame/repositories/i
 
 class Person(rdfSubject):
     rdf_type = matching.Person
+    
+class Concept(rdfSubject):
+    rdf_type = matching.Concept
